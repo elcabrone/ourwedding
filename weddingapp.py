@@ -1,4 +1,4 @@
-from bottle import request, route, template, run, jinja2_view
+from bottle import request, route, template, run, jinja2_view, redirect
 import sqlite3
 import functools
 
@@ -27,28 +27,29 @@ def admin():
     milestones = cur.fetchall()
     return dict(milestones=milestones, admin=1)
 
-@route("/add", methods=['POST'])
+@route("/add", method='POST')
 def add():
     c.execute("insert into milestones (activity, schedule, location) values (?, ?, ?)",
-        [request.form['activity'], request.form['schedule'], request.form['location']]) 
+        [request.forms['activity'], request.forms['schedule'], request.forms['location']]) 
     conn.commit()
-    return redirect(url_for('startup'))
+    return redirect('/')
 
 @route("/del/<number>")
 def delete(number):
     c.execute("delete from milestones where MID=?", number)
     conn.commit()
-    return redirect(url_for('startup'))    
+    return redirect('/')    
     
 @route("/init")
 def init():
-    with open_resource('wedding_schema.sql', mode='r') as f:
+    with open('wedding_schema.sql', 'r') as f:
         c.executescript(f.read())
-    return redirect(url_for('startup'))
+    return redirect('/')
 
 # server run
 if __name__ == "__main__":
-    run(server="flup", host='localhost', port=8080)
+#    run(server="flup", host='localhost', port=8080)
+    run(host='localhost', port=8080)
 
 
 #from werkzeug.contrib.fixers import LighttpdCGIRootFix
