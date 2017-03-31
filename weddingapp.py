@@ -1,55 +1,47 @@
-from bottle import request, route, template, run, jinja2_view, redirect
-import sqlite3
+from bottle import request, route, template, run, jinja2_view, redirect, static_file
 import functools
+import os
 
 view = functools.partial(jinja2_view, template_lookup=['templates'])
+subps = ['start.html', 'agenda.html', 'drive.html', 'hotels.html', 'music.html', 'picture.html', 'checkin.html']
 
-# db management
-conn = sqlite3.connect('wedding.db', check_same_thread=False)
-c = conn.cursor()
-
-@route('/app/<name>')
-def hello_name(name):
-    return "Hello " + name
+# handler for static files
+@route('/static/:path#.+#', name='static')
+def static(path):
+    subp = 'content_' + path
+    if path == subps[5]:
+        res = [f for f in os.listdir('pictures') if os.path.isfile(os.path.join('pictures', f))]
+        res = [k for k in res if 'jpg' in k]
+        return template('templates/template.html', subp=subp, res=res)
+    elif path in subps:
+        subp = 'content_' + path
+        if os.path.isfile('templates/' + subp):
+            return template('templates/template.html', subp=subp)
+        else:
+            return template('templates/template.html', subp='')
+    return static_file(path, root='static')
+    
+@route('/pictures/:path#.+#', name='pictures')
+def static(path):
+    return static_file(path, root='pictures')
+    
+# Test
+@route('/app/<name>/<surname>')
+def hello_name(name, surname):
+    return "Hello " + name + ", " + surname
 
 # website routing
 @route("/")
-@view('wedding.html')
+#@view('template.html')
 def startup():
-    cur = conn.execute('SELECT * from milestones')
-    milestones = cur.fetchall()
-    return dict(milestones=milestones, admin=0)
-
-@route("/admin")
-@view('wedding.html')
-def admin():
-    cur = conn.execute('SELECT * from milestones')
-    milestones = cur.fetchall()
-    return dict(milestones=milestones, admin=1)
-
-@route("/add", method='POST')
-def add():
-    c.execute("insert into milestones (activity, schedule, location) values (?, ?, ?)",
-        [request.forms['activity'], request.forms['schedule'], request.forms['location']]) 
-    conn.commit()
-    return redirect('/')
-
-@route("/del/<number>")
-def delete(number):
-    c.execute("delete from milestones where MID=?", number)
-    conn.commit()
-    return redirect('/')    
-    
-@route("/init")
-def init():
-    with open('wedding_schema.sql', 'r') as f:
-        c.executescript(f.read())
-    return redirect('/')
+#    return dict(subp='agenda')
+#    return static_file("start.html", root="static/")
+    return template('templates/template.html', subp='content_start.html')
 
 # server run
 if __name__ == "__main__":
 #    run(server="flup", host='localhost', port=8080)
-    run(host='localhost', port=8080)
+    run(host='0.0.0.0', port=8080)
 
 
 #from werkzeug.contrib.fixers import LighttpdCGIRootFix
