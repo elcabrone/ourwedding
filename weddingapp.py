@@ -10,8 +10,11 @@ subps = ['start.html', 'agenda.html', 'drive.html', 'hotels.html', 'music.html',
 def static(path):
     subp = 'content_' + path
     if path == subps[5]:
-        res = [f for f in os.listdir('pictures') if os.path.isfile(os.path.join('pictures', f))]
-        res = [k for k in res if 'jpg' in k]
+        res = [f for f in os.listdir('pictures') if os.path.isfile(os.path.join('pictures', f))] # take all filenames from directory
+        res = [k for k in res if 'jpg' in k] # put in list if contains jpg
+        nms = [w.replace(".jpg", "") for w in res] # remove the .jpg
+        res = [res, nms] # put in one list
+        res = map(list, zip(*res)) # transpose
         return template('templates/template.html', subp=subp, res=res)
     elif path in subps:
         subp = 'content_' + path
