@@ -4,18 +4,13 @@ import os
 
 view = functools.partial(jinja2_view, template_lookup=['templates'])
 subps = ['start.html', 'agenda.html', 'drive.html', 'hotels.html', 'music.html', 'picture.html', 'checkin.html']
-
+    
 # handler for static files
 @route('/static/:path#.+#', name='static')
 def static(path):
     subp = 'content_' + path
     if path == subps[5]:
-        res = [f for f in os.listdir('pictures') if os.path.isfile(os.path.join('pictures', f))] # take all filenames from directory
-        res = [k for k in res if 'jpg' in k] # put in list if contains jpg
-        nms = [w.replace(".jpg", "") for w in res] # remove the .jpg
-        res = [res, nms] # put in one list
-        res = map(list, zip(*res)) # transpose
-        return template('templates/template.html', subp=subp, res=res)
+        return template('templates/template.html', subp=subp, res=picres())
     elif path in subps:
         subp = 'content_' + path
         if os.path.isfile('templates/' + subp):
@@ -40,6 +35,15 @@ def startup():
 #    return dict(subp='agenda')
 #    return static_file("start.html", root="static/")
     return template('templates/template.html', subp='content_start.html')
+
+def picres():
+    res = [f for f in os.listdir('pictures') if os.path.isfile(os.path.join('pictures', f))] # take all filenames from directory
+    res = [k for k in res if 'jpg' in k.lower()] # put in list if contains jpg
+    res.sort()
+    nms = [w.replace(".jpg", "") for w in res] # remove the .jpg
+    nms = [w.replace(".JPG", "") for w in nms] # remove the .jpg
+    res = [res, nms] # put in one list
+    return map(list, zip(*res)) # transpose
 
 # server run
 if __name__ == "__main__":
