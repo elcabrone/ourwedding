@@ -1,54 +1,54 @@
-from bottle import request, route, template, run, jinja2_view
-import sqlite3
+from bottle import request, route, template, run, jinja2_view, redirect, static_file
 import functools
+import os
 
 view = functools.partial(jinja2_view, template_lookup=['templates'])
-
-# db management
-conn = sqlite3.connect('wedding.db', check_same_thread=False)
-c = conn.cursor()
-
-@route('/app/<name>')
-def hello_name(name):
-    return "Hello " + name
+subps = ['start.html', 'agenda.html', 'drive.html', 'hotels.html', 'music.html', 'picture.html', 'checkin.html']
+    
+# handler for static files
+@route('/static/:path#.+#', name='static')
+def static(path):
+    subp = 'content_' + path
+    if path == subps[5]:
+        return template('templates/template.html', subp=subp, res=picres())
+    elif path in subps:
+        subp = 'content_' + path
+        if os.path.isfile('templates/' + subp):
+            return template('templates/template.html', subp=subp)
+        else:
+            return template('templates/template.html', subp='')
+    return static_file(path, root='static')
+    
+@route('/pictures/:path#.+#', name='pictures')
+def static(path):
+    return static_file(path, root='pictures')
+    
+# Test
+@route('/app/<name>/<surname>')
+def hello_name(name, surname):
+    return "Hello " + name + ", " + surname
 
 # website routing
 @route("/")
-@view('wedding.html')
+#@view('template.html')
 def startup():
-    cur = conn.execute('SELECT * from milestones')
-    milestones = cur.fetchall()
-    return dict(milestones=milestones, admin=0)
+#    return dict(subp='agenda')
+#    return static_file("start.html", root="static/")
+    return template('templates/template.html', subp='content_start.html')
 
-@route("/admin")
-@view('wedding.html')
-def admin():
-    cur = conn.execute('SELECT * from milestones')
-    milestones = cur.fetchall()
-    return dict(milestones=milestones, admin=1)
-
-@route("/add", methods=['POST'])
-def add():
-    c.execute("insert into milestones (activity, schedule, location) values (?, ?, ?)",
-        [request.form['activity'], request.form['schedule'], request.form['location']]) 
-    conn.commit()
-    return redirect(url_for('startup'))
-
-@route("/del/<number>")
-def delete(number):
-    c.execute("delete from milestones where MID=?", number)
-    conn.commit()
-    return redirect(url_for('startup'))    
-    
-@route("/init")
-def init():
-    with open_resource('wedding_schema.sql', mode='r') as f:
-        c.executescript(f.read())
-    return redirect(url_for('startup'))
+def picres():
+    res = [f for f in os.listdir('pictures') if os.path.isfile(os.path.join('pictures', f))] # take all filenames from directory
+    res = [k for k in res if 'jpg' in k.lower()] # put in list if contains jpg
+    res.sort()
+    nms = [w.replace(".jpg", "") for w in res] # remove the .jpg
+    nms = [w.replace(".JPG", "") for w in nms] # remove the .jpg
+    res = [res, nms] # put in one list
+    return map(list, zip(*res)) # transpose
 
 # server run
 if __name__ == "__main__":
-    run(server="flup", host='localhost', port=8080)
+#    run(server="flup", host='localhost', port=8080)
+    run(host='0.0.0.0', port=8080)
 
 
 #from werkzeug.contrib.fixers import LighttpdCGIRootFix

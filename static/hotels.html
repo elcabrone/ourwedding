@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <title>Traufe Sabrina Jonathan X</title>
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="http://static.ourwedding.cloud/w3.css">
 <link rel="stylesheet" href="http://static.ourwedding.cloud/w3-theme-red.css">
@@ -12,11 +13,12 @@
   <br><br><br><br>
  </div>
 <br><font size="5">
-<a href="/agenda">Agenda</a> 
-<a href="/drive">Anfahrt</a> 
-<a href="/hotels">Hotels</a> 
-<a href="/picture">Bilder </a> 
-<a href="/music">Musikw&uuml;nsche</a> 
+<a href="agenda.html">Agenda</a> 
+<a href="drive.html">Anfahrt</a> 
+<a href="hotels.html">Hotels</a> 
+<a href="picture.html">Bilder </a> 
+<a href="music.html">Musikw&uuml;nsche</a> 
+<a href="checkin.html">Check-In</a> 
 </font>
 </nav>
 <header class="w3-container w3-card-4 w3-theme">
@@ -26,43 +28,20 @@
 
 <div class="w3-container">
 <hr>
-{% for milestone in milestones %}
-{% if admin %}
-<a href="/del/{{milestone[0]}}" align="right">LOESCHEN</a>
-{% endif %}	
-<div class="w3-row">
-  <div class="w3-col s9 w3-container">
-    <h3> {{ milestone[1] }}  </h3>
-    <p> 
-		{% if milestone[2] != "" %}
-		{{ milestone[2] }}, 
-		{% endif %}
-		{{ milestone[3] }} </p>
-  </div>
-</div>
-<hr>
-{% endfor %}
+
+<!-- Editierbereich Anfang -->
 
 <div class="w3-row">
   <div class="w3-col s9 w3-container">
-    <h3>Anfahrt </h3>
-    <p><a href="http://maps.google.com/maps?daddr=52.292726,10.532266&amp;ll=">Doweseeweg 1, 38112 Braunschweig</a></p>
+    <h3> Pentahotel </h3>
+    <p> Auguststraße 6, 38100 Braunschweig, Tel.: 0531 4814708 </p>
   </div>
 </div>
 <hr>
+<!-- Editierbereich Ende -->
 
-{% if admin %}
-<form action="/add", method="post">
-	<input type="text", name="activity", value="Was">
-	<input type="text", name="schedule", value="Wann">
-	<input type="text", name="location", value="Wo">
-	<input type="submit">
-</form>
-{% endif %}	
-
-</div>
 <footer class="w3-container w3-theme">
-  <h4>Viel Freude</h4>
+  <h4></h4>
 </footer>
 <script>
 function w3_open() {
