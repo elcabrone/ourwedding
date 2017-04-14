@@ -16,11 +16,9 @@ def static(path):
     elif path in subps:
         subp = 'content_' + path
         if os.path.isfile('templates/' + subp):
-            print('returning from templates')
             return template('templates/template.html', subp=subp)
         else:
             return template('templates/template.html', subp='')
-    print('returning file from static')
     return static_file(path, root='static')
     
 @route('/pictures/:path#.+#', name='pictures')
@@ -38,7 +36,7 @@ def register():
 
     with open("responses", 'a') as f:
         f.write('Name: ' + name + ', Antwort: ' + resp + ', Personenzahl: ' + pers + ', Vegetarier: ' + vegi + '\n')
-    return redirect('http://ourwedding.cloud/krost/start')
+    return redirect('http://ourwedding.cloud/krost')
 
 # Test
 @route('/test/:vari')
@@ -49,7 +47,7 @@ def test(vari='Test'):
 @route("/")
 @route("/krost")
 def loader():
-	return redirect("/krost/start")
+	return redirect("http://ourwedding.cloud/krost/start")
 
 @route("/start")
 #@view('template.html')
